@@ -44,9 +44,6 @@ export default defineConfig({
           pinia: ['defineStore', 'storeToRefs'],
         },
       ],
-      eslintrc: {
-        enabled: true,
-      },
       vueTemplate: true,
     }),
   ],
