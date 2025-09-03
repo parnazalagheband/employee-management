@@ -1,0 +1,1 @@
+export const BASE_URL = "https://pouya-salamat-employee-task.liara.run/";
