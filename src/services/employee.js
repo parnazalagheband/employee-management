@@ -7,6 +7,14 @@ const employeeService = {
   getEmployeeById(id) {
     return axios.get(`/employee/${id}`);
   },
+
+  updateEmployee(id, payload) {
+    return axios.put(`/employee/${id}`, payload);
+  },
+
+  addEmployee(payload) {
+    return axios.post("/employee", payload);
+  },
 };
 
 export default employeeService;
