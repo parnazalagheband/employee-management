@@ -54,6 +54,6 @@ const closeEmployeeForm = () => {
 };
 
 onMounted(() => {
-  employeeStore.getEmployee();
+  employeeStore.getEmployees();
 });
 </script>

@@ -1,7 +1,7 @@
 import employeeServices from "@/services/employee";
 
 export const actions = {
-  async getEmployee() {
+  async getEmployees() {
     this.loading = true;
     try {
       const response = await employeeServices.getEmployees();
