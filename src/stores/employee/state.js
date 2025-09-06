@@ -1,5 +1,5 @@
 export const state = () => ({
   employees: [],
-  employeeDetail:{},
+  employeeDetail:null,
   loading:false
 });

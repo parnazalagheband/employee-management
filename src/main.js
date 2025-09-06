@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { registerPlugins } from '@/plugins'
+import toastPlugin from '@/plugins/toast.js';
 import Vue3PersianDatetimePicker from 'vue3-persian-datetime-picker'
 import App from './App.vue'
 import 'unfonts.css'

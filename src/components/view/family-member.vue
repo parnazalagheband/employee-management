@@ -15,42 +15,40 @@
               placeholder="سارا"
               type="text"
               variant="outlined"
-              v-model="memberInfo.name"
-              @update:modelValue="updateFamilyMember"
-            ></v-text-field>
+              v-model="name"
+              :error-messages="nameError"
+            />
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
               :class="`custom-input-${index}`"
               variant="outlined"
               append-inner-icon="mdi-calendar-week-begin-outline"
-              v-model="memberInfo.dateOfBirth"
-              @update:modelValue="updateFamilyMember"
-              placeholder="روز / ماه / سال"
-            >
-            </v-text-field>
+              v-model="dob"
+              :error-messages="dobError"
+              placeholder="تاریخ تولد"
+            />
             <date-picker
               color="#536DFE"
               format="jYYYY/jMM/jDD"
               locale="fa"
-              placeholder="روز / ماه / سال"
-              v-model="memberInfo.dateOfBirth"
+              v-model="dob"
               :custom-input="`.custom-input-${index}`"
               type="date"
-            ></date-picker>
+            />
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12" md="6" sm="12">
             <v-select
-              v-model="memberInfo.relation"
-              @update:modelValue="updateFamilyMember"
+              v-model="relation"
               label="نسبت"
               variant="outlined"
               :items="relations"
               item-title="title"
               item-value="value"
-            ></v-select>
+              :error-messages="relationError"
+            />
           </v-col>
         </v-row>
       </v-form>
@@ -59,45 +57,24 @@
 </template>
 
 <script setup>
-import { convertDatee } from "@/composables/convertDate";
-const { toJalali } = convertDatee();
+import { useField } from "vee-validate";
+import { employeeRules } from "@/validation/employeeRules";
 
-const emit = defineEmits(['removeMember','updateMember']);
+
+const props = defineProps({
+  index: Number,
+  memberName: String,
+  memberRelation: String,
+  memberBirthday: String,
+});
+
+const { value: name, errorMessage: nameError } = useField(props.memberName,employeeRules.family.name);
+const { value: relation, errorMessage: relationError } = useField(props.memberRelation,employeeRules.family.relation);
+const { value: dob, errorMessage: dobError } = useField(props.memberBirthday,employeeRules.family.dateOfBirth);
 
 const relations = [
   { title: "دختر", value: "daughter" },
   { title: "پسر", value: "son" },
   { title: "همسر", value: "spouse" },
 ];
-
-const props = defineProps({
-  member: {
-    type: Object,
-    default: () => ({}),
-  },
-  index: {
-    type: Number,
-    required: true,
-  },
-});
-
-const memberInfo = ref({
-  name: "",
-  dateOfBirth: "",
-  relation: "",
-});
-
-const updateFamilyMember = () =>{
-  emit("updateMember", props.index, memberInfo.value);
-}
-
-onMounted(() => {
-  if (props.member) {
-    memberInfo.value = {
-      name: props.member.name || "",
-      dateOfBirth: props.member.dateOfBirth ? toJalali(props.member.dateOfBirth) : "",
-      relation: props.member.relation || "",
-    };
-  }
-});
 </script>

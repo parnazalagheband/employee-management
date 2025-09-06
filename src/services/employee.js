@@ -15,6 +15,10 @@ const employeeService = {
   addEmployee(payload) {
     return axios.post("/employee", payload);
   },
+
+  deleteEmployee(id) {
+    return axios.delete(`/employee/${id}`);
+  },
 };
 
 export default employeeService;

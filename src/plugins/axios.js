@@ -1,6 +1,6 @@
 import axios from "axios";
 import { BASE_URL } from "@/constants/general";
-// import nofit from "@/plugins/notification.plugin";
+import { toast } from "@/plugins/toast"; 
 
 const axiosInstance = axios.create({
   timeout: 30000,
@@ -22,14 +22,18 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    const { errors } = error.response?.data || {};
+    const { errors, detail } = error.response?.data || {};
+
     if (errors) {
       Object.keys(errors).forEach((key) => {
-        // nofit.error(`${key}: ${errors[key][0]} !!`);
+        toast.error(`${key}: ${errors[key][0]}`);
       });
+    } else if (detail) {
+      toast.error(detail);
     } else {
-      // nofit.error("Something went wrong !!");
+      toast.error("در ارتباط با سرور مشکلی به‌وجود آمده است.");
     }
+
     return Promise.reject(error);
   }
 );

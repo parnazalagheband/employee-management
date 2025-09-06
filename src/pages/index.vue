@@ -1,5 +1,8 @@
 <template>
   <v-container class="d-flex flex-column justify-center" width="700">
+    <div class="pr-5">
+      <h1>کارمندان</h1>
+    </div>
     <employee-list />
     <v-col
       v-show="!showAddEmployee"

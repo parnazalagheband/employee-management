@@ -25,6 +25,7 @@
           formType="update"
           :formData="employeeStore.employeeDetail"
           :id="open[0]"
+          v-if="open[0] === employee.id"
         />
       </v-list-group>
     </v-list>

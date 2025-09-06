@@ -26,6 +26,7 @@ export const actions = {
   },
 
   async updateEmployee(id, payload) {
+    this.loading = true;
     try {
       const response = await employeeServices.updateEmployee(id, payload);
       console.log(response, 111);
@@ -39,10 +40,14 @@ export const actions = {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      this.loading = false;
     }
   },
 
   async addEmployee(payload) {
+    this.loading = true;
+
     try {
       const response = await employeeServices.addEmployee(payload);
       console.log(response);
@@ -53,6 +58,19 @@ export const actions = {
       });
     } catch (error) {
       console.log(error);
+    } finally {
+      this.loading = false;
+    }
+  },
+  async deleteEmployee(id) {
+    this.loading = true;
+    try {
+      await employeeServices.deleteEmployee(id);
+      this.employees = this.employees.filter((emp) => emp.id !== id);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loading = false;
     }
   },
 };

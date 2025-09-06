@@ -12,13 +12,10 @@
         افزودن کارمند
       </legend>
       <div class="d-flex" v-if="formType === 'update'">
-        <v-btn
-          size="small"
-          variant="elevated"
-          icon="mdi-delete"
-          color="red"
-          class="mr-auto"
-        ></v-btn>
+        <delete-employee
+          @closeEmployeeForm="$emit('closeEditEmployee')"
+          :id="id"
+        />
       </div>
       <v-form @submit.prevent="submitForm" class="mt-3">
         <v-row>
@@ -26,61 +23,61 @@
             <v-text-field
               label="نام"
               placeholder="سارا"
-              type="text"
+              v-model="firstName"
+              :error-messages="firstNameError"
               variant="outlined"
-              v-model="employeeData.firstName"
-            ></v-text-field>
+            />
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
               label="نام خانوادگی"
               placeholder="امینی"
-              type="text"
+              v-model="lastName"
+              :error-messages="lastNameError"
               variant="outlined"
-              v-model="employeeData.lastName"
-            ></v-text-field>
+            />
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12" md="6">
             <v-text-field
               class="custom-input"
-              variant="outlined"
+              :value="dateOfBirth"
+              readonly
+              placeholder="تاریخ تولد"
               append-inner-icon="mdi-calendar-week-begin-outline"
-              v-model="employeeData.dateOfBirth"
-              placeholder="روز / ماه / سال"
-            >
-            </v-text-field>
+              variant="outlined"
+              :error-messages="birthdayError"
+            />
             <date-picker
-              color="#536DFE"
+              v-model="dateOfBirth"
+              custom-input=".custom-input"
               format="jYYYY/jMM/jDD"
               locale="fa"
-              placeholder="روز / ماه / سال"
-              v-model="employeeData.dateOfBirth"
-              custom-input=".custom-input"
-              type="date"
-            ></date-picker>
+            />
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
               label="ایمیل"
               placeholder="sara@gmail.com"
-              type="email"
+              v-model="email"
+              :error-messages="emailError"
               variant="outlined"
-              v-model="employeeData.email"
-            ></v-text-field>
+            />
           </v-col>
         </v-row>
+
         <fieldset class="border-md rounded pa-3 mt-3">
           <legend class="text-h5 mr-5 pa-2">اعضای خانواده</legend>
-          <div v-if="employeeData.family?.length">
+          <div v-if="familyFields.length">
             <family-member
-              v-for="(member, index) in employeeData.family"
-              :key="index"
+              v-for="(member, index) in familyFields"
+              :key="member.key"
               :index="index + 1"
-              :member="member"
-              @removeMember="removeMember"
-              @updateMember="updateMember"
+              :memberName="`family.${index}.name`"
+              :memberRelation="`family.${index}.relation`"
+              :memberBirthday="`family.${index}.dateOfBirth`"
+              @removeMember="removeMember(index)"
             />
           </div>
           <div v-else class="text-center text-grey text-body-2 pa-2">
@@ -92,6 +89,7 @@
             >
           </v-card-actions>
         </fieldset>
+
         <div
           v-if="formType === 'create'"
           class="d-flex justify-space-between mt-3"
@@ -108,6 +106,10 @@
 </template>
 
 <script setup>
+import { ref, watch } from "vue";
+import { useForm, useField, useFieldArray } from "vee-validate";
+import { toast } from "@/plugins/toast";
+import { employeeRules } from "@/validation/employeeRules";
 import { convertDatee } from "@/composables/convertDate";
 const { toJalali, toIso } = convertDatee();
 import { useEmployeeStore } from "@/stores/employee";
@@ -116,89 +118,98 @@ const employeeStore = useEmployeeStore();
 const emit = defineEmits(["cancelAddEmployee", "closeEditEmployee"]);
 
 const props = defineProps({
-  formData: {
-    type: Object,
-    default: () => ({}),
-  },
-  formType: {
-    type: String,
-    required: true,
-    validator: (val) => ["create", "update"].includes(val),
-  },
-  id: {
-    type: String,
-    default: "",
+  formData: Object,
+  formType: { type: String, required: true },
+  id: { type: String, default: "" },
+});
+
+const { handleSubmit, errors, setFieldValue, resetForm } = useForm({
+  initialValues: {
+    firstName: "",
+    lastName: "",
+    email: "",
+    dateOfBirth: "",
+    family: [],
   },
 });
 
-const employeeData = ref({
-  firstName: "",
-  lastName: "",
-  email: "",
-  dateOfBirth: "",
-  family: [],
-});
-
-watch(
-  () => props.formData,
-  (newVal) => {
-    if (props.formType === "update" && newVal) {
-      employeeData.value.firstName = props.formData.firstName;
-      employeeData.value.lastName = props.formData.lastName;
-      employeeData.value.email = props.formData.email;
-      employeeData.value.dateOfBirth = toJalali(props.formData.dateOfBirth);
-      employeeData.value.family = props.formData.family;
-    }
-  },
-  { immediate: true, deep: true }
+const { value: firstName, errorMessage: firstNameError } = useField(
+  "firstName",
+  employeeRules.firstName
+);
+const { value: lastName, errorMessage: lastNameError } = useField(
+  "lastName",
+  employeeRules.lastName
+);
+const { value: email, errorMessage: emailError } = useField(
+  "email",
+  employeeRules.email
+);
+const { value: dateOfBirth, errorMessage: birthdayError } = useField(
+  "dateOfBirth",
+  employeeRules.dateOfBirth
 );
 
+const { fields: familyFields, push, remove, replace } = useFieldArray("family");
+
+if (props.formType === "update") {
+  watch(
+    () => props.formData,
+    (newVal) => {
+      if (newVal) {
+        setFieldValue("firstName", newVal.firstName);
+        setFieldValue("lastName", newVal.lastName);
+        setFieldValue("email", newVal.email);
+
+        if (newVal.dateOfBirth) {
+          setFieldValue("dateOfBirth", toJalali(newVal.dateOfBirth));
+        } else {
+          setFieldValue("dateOfBirth", "");
+        }
+
+        const familyWithJalali = (newVal?.family || []).map((member) => ({
+          ...member,
+          dateOfBirth: member.dateOfBirth ? toJalali(member.dateOfBirth) : "",
+        }));
+
+        setFieldValue("family", familyWithJalali);
+      }
+    },
+    { immediate: true }
+  );
+}
+
+
+const addMember = () => push({ name: "", relation: "", dateOfBirth: "" });
+
+const removeMember = (index) => remove(index);
+
+const updateMember = (index, member) =>
+  setFieldValue(`family.${index}`, member);
+
 const cancelAddEmployee = () => {
-  emit("cancelAddEmployee");
   resetForm();
+  emit("cancelAddEmployee");
 };
 
-const addMember = () => {
-  employeeData.value.family.push({
-    name: "",
-    relation: "",
-    dateOfBirth: "",
-  });
-};
-
-const removeMember = (index) => {
-  employeeData.value.family.splice(index - 1, 1);
-};
-
-const updateMember = (index, member) => {
-  employeeData.value.family[index - 1] = { ...member };
-};
-
-const submitForm = () => {
+const submitForm = handleSubmit((vals) => {
   const payload = {
-    ...employeeData.value,
-    dateOfBirth: toIso(employeeData.value.dateOfBirth),
-    family: employeeData.value.family.map((member) => ({
+    ...vals,
+    dateOfBirth: toIso(vals.dateOfBirth),
+    family: vals.family.map((member) => ({
       ...member,
-      dateOfBirth: toIso(member.dateOfBirth),
+      dateOfBirth: member.dateOfBirth ? toIso(member.dateOfBirth) : "",
     })),
   };
 
   if (props.formType === "update") {
     employeeStore.updateEmployee(props.id, payload);
+    toast.success("اطلاعات کارمند با موفقیت به روزرسانی شد.");
     emit("closeEditEmployee");
-  }
-  else{
+  } else {
     employeeStore.addEmployee(payload);
+    toast.success("کارمند با موفقیت اضافه شد!");
     cancelAddEmployee();
   }
-};
-
-const resetForm = () => {
-  employeeData.value.firstName = "";
-  employeeData.value.lastName = "";
-  employeeData.value.email = "";
-  employeeData.value.dateOfBirth = "";
-  employeeData.value.family = [];
-};
+});
 </script>
