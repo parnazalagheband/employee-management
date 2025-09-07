@@ -18,6 +18,7 @@ declare module 'vue' {
     FamilyMember: typeof import('./src/components/view/family-member.vue')['default']
     FieldArray: typeof import('./src/components/common/form-fields/field-array.vue')['default']
     GlobalLoader: typeof import('./src/components/common/global-loader.vue')['default']
+    NoEmployee: typeof import('./src/components/view/no-employee.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

@@ -5,6 +5,7 @@
       v-model:opened="open"
       @update:opened="handleOpened"
     >
+      <no-employee v-if="employeeStore.employees.length === 0" />
       <v-list-group
         v-for="employee in employeeStore.employees"
         :key="employee.id"
@@ -15,7 +16,10 @@
           <v-list-item v-bind="props">
             <v-list-item-content class="d-flex ga-1">
               <v-icon color="indigo-accent-2">mdi-account</v-icon>
-              <v-list-item-title>{{ employee.firstName }} {{ employee.lastName }}</v-list-item-title>
+              <v-list-item-title
+                >{{ employee.firstName }}
+                {{ employee.lastName }}</v-list-item-title
+              >
             </v-list-item-content>
           </v-list-item>
         </template>
@@ -43,7 +47,7 @@ const handleOpened = (newOpened) => {
   const currentOpen = newOpened[newOpened.length - 1];
   if (currentOpen) {
     employeeStore.getEmployeeById(currentOpen);
-    open.value = [currentOpen]; 
+    open.value = [currentOpen];
   } else {
     open.value = [];
   }
