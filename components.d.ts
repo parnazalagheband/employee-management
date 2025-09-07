@@ -8,14 +8,16 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AppFooter: typeof import('./src/components/AppFooter.vue')['default']
+    BaseDatePicker: typeof import('./src/components/common/form-fields/base-date-picker.vue')['default']
+    BaseInput: typeof import('./src/components/common/form-fields/base-input.vue')['default']
+    BaseSelect: typeof import('./src/components/common/form-fields/base-select.vue')['default']
+    DatePicker: typeof import('./src/components/common/form-fields/date-picker.vue')['default']
     DeleteEmployee: typeof import('./src/components/view/delete-employee.vue')['default']
     EmployeeDetail: typeof import('./src/components/view/employee-detail.vue')['default']
     EmployeeList: typeof import('./src/components/view/employee-list.vue')['default']
     FamilyMember: typeof import('./src/components/view/family-member.vue')['default']
-    GloabalLoader: typeof import('./src/components/common/global-loader.vue')['default']
+    FieldArray: typeof import('./src/components/common/form-fields/field-array.vue')['default']
     GlobalLoader: typeof import('./src/components/common/global-loader.vue')['default']
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

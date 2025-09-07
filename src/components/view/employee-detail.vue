@@ -20,74 +20,44 @@
       <v-form @submit.prevent="submitForm" class="mt-3">
         <v-row>
           <v-col cols="12" md="6">
-            <v-text-field
+            <base-input
               label="نام"
               placeholder="سارا"
-              v-model="firstName"
-              :error-messages="firstNameError"
-              variant="outlined"
+              :rules="employeeRules.firstName"
+              field-key="firstName"
             />
           </v-col>
           <v-col cols="12" md="6">
-            <v-text-field
+            <base-input
               label="نام خانوادگی"
               placeholder="امینی"
-              v-model="lastName"
-              :error-messages="lastNameError"
-              variant="outlined"
+              :rules="employeeRules.lastName"
+              field-key="lastName"
             />
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12" md="6">
-            <v-text-field
-              class="custom-input"
-              :value="dateOfBirth"
-              readonly
+            <base-date-picker
               placeholder="تاریخ تولد"
-              append-inner-icon="mdi-calendar-week-begin-outline"
-              variant="outlined"
-              :error-messages="birthdayError"
-            />
-            <date-picker
-              v-model="dateOfBirth"
-              custom-input=".custom-input"
-              format="jYYYY/jMM/jDD"
-              locale="fa"
+              field-key="dateOfBirth"
+              :rules="employeeRules.dateOfBirth"
+              :id="id"
             />
           </v-col>
           <v-col cols="12" md="6">
-            <v-text-field
+            <base-input
               label="ایمیل"
               placeholder="sara@gmail.com"
-              v-model="email"
-              :error-messages="emailError"
-              variant="outlined"
+              :rules="employeeRules.email"
+              field-key="email"
             />
           </v-col>
         </v-row>
 
         <fieldset class="border-md rounded pa-3 mt-3">
           <legend class="text-h5 mr-5 pa-2">اعضای خانواده</legend>
-          <div v-if="familyFields.length">
-            <family-member
-              v-for="(member, index) in familyFields"
-              :key="member.key"
-              :index="index + 1"
-              :memberName="`family.${index}.name`"
-              :memberRelation="`family.${index}.relation`"
-              :memberBirthday="`family.${index}.dateOfBirth`"
-              @removeMember="removeMember(index)"
-            />
-          </div>
-          <div v-else class="text-center text-grey text-body-2 pa-2">
-            هیچ عضوی ثبت نشده است
-          </div>
-          <v-card-actions class="pr-4">
-            <v-btn @click="addMember" variant="flat" color="blue"
-              >افزودن عضو</v-btn
-            >
-          </v-card-actions>
+          <field-array field-key="family" />
         </fieldset>
 
         <div
@@ -123,7 +93,7 @@ const props = defineProps({
   id: { type: String, default: "" },
 });
 
-const { handleSubmit, errors, setFieldValue, resetForm } = useForm({
+const { handleSubmit, errors, resetForm, setValues } = useForm({
   initialValues: {
     firstName: "",
     lastName: "",
@@ -133,59 +103,26 @@ const { handleSubmit, errors, setFieldValue, resetForm } = useForm({
   },
 });
 
-const { value: firstName, errorMessage: firstNameError } = useField(
-  "firstName",
-  employeeRules.firstName
-);
-const { value: lastName, errorMessage: lastNameError } = useField(
-  "lastName",
-  employeeRules.lastName
-);
-const { value: email, errorMessage: emailError } = useField(
-  "email",
-  employeeRules.email
-);
-const { value: dateOfBirth, errorMessage: birthdayError } = useField(
-  "dateOfBirth",
-  employeeRules.dateOfBirth
-);
-
-const { fields: familyFields, push, remove, replace } = useFieldArray("family");
-
 if (props.formType === "update") {
   watch(
     () => props.formData,
     (newVal) => {
       if (newVal) {
-        setFieldValue("firstName", newVal.firstName);
-        setFieldValue("lastName", newVal.lastName);
-        setFieldValue("email", newVal.email);
-
-        if (newVal.dateOfBirth) {
-          setFieldValue("dateOfBirth", toJalali(newVal.dateOfBirth));
-        } else {
-          setFieldValue("dateOfBirth", "");
-        }
-
-        const familyWithJalali = (newVal?.family || []).map((member) => ({
-          ...member,
-          dateOfBirth: member.dateOfBirth ? toJalali(member.dateOfBirth) : "",
-        }));
-
-        setFieldValue("family", familyWithJalali);
+        setValues({
+          firstName: newVal.firstName,
+          lastName: newVal.lastName,
+          email: newVal.email,
+          dateOfBirth: newVal.dateOfBirth ? toJalali(newVal.dateOfBirth) : "",
+          family: (newVal.family || []).map((member) => ({
+            ...member,
+            dateOfBirth: member.dateOfBirth ? toJalali(member.dateOfBirth) : "",
+          })),
+        });
       }
     },
     { immediate: true }
   );
 }
-
-
-const addMember = () => push({ name: "", relation: "", dateOfBirth: "" });
-
-const removeMember = (index) => remove(index);
-
-const updateMember = (index, member) =>
-  setFieldValue(`family.${index}`, member);
 
 const cancelAddEmployee = () => {
   resetForm();
@@ -204,7 +141,7 @@ const submitForm = handleSubmit((vals) => {
 
   if (props.formType === "update") {
     employeeStore.updateEmployee(props.id, payload);
-    toast.success("اطلاعات کارمند با موفقیت به روزرسانی شد.");
+    toast.success("اطلاعات کارمند با موفقیت به روزرسانی شد");
     emit("closeEditEmployee");
   } else {
     employeeStore.addEmployee(payload);
