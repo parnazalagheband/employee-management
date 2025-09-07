@@ -4,7 +4,12 @@
       <legend class="text-h6 mr-5 pa-2">
         <div class="d-flex align-center">
           <span>#{{ index }}</span>
-          <v-btn @click="$emit('removeMember', index)" variant="text" icon="mdi-delete" color="red"></v-btn>
+          <v-btn
+            @click="$emit('removeMember', index)"
+            variant="text"
+            icon="mdi-delete"
+            color="red"
+          ></v-btn>
         </div>
       </legend>
       <v-form class="pa-3">
@@ -60,7 +65,6 @@
 import { useField } from "vee-validate";
 import { employeeRules } from "@/validation/employeeRules";
 
-
 const props = defineProps({
   index: Number,
   memberName: String,
@@ -68,9 +72,22 @@ const props = defineProps({
   memberBirthday: String,
 });
 
-const { value: name, errorMessage: nameError } = useField(props.memberName,employeeRules.family.name);
-const { value: relation, errorMessage: relationError } = useField(props.memberRelation,employeeRules.family.relation);
-const { value: dob, errorMessage: dobError } = useField(props.memberBirthday,employeeRules.family.dateOfBirth);
+const memberName = computed(() => props.memberName);
+const memberRelation = computed(() => props.memberRelation);
+const memberBirthday = computed(() => props.memberBirthday);
+
+const { value: name, errorMessage: nameError } = useField(
+  memberName,
+  employeeRules.family.name
+);
+const { value: relation, errorMessage: relationError } = useField(
+  memberRelation,
+  employeeRules.family.relation
+);
+const { value: dob, errorMessage: dobError } = useField(
+  memberBirthday,
+  employeeRules.family.dateOfBirth
+);
 
 const relations = [
   { title: "دختر", value: "daughter" },
