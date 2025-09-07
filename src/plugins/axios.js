@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (request) => {
     const token = "parnaz-alagheband-6d5a9582-adc3-428e-8e83-17056dc48cb0";
-    request.headers["Authorization"] = `Token ${token}`;
+    request.headers["Authorization"] = token;
     request.headers["Cache-Control"] = "no-cache";
     request.headers["Pragma"] = "no-cache";
     request.headers["Expires"] = "0";
