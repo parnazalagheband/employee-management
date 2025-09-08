@@ -57,7 +57,7 @@
 
         <fieldset class="border-md rounded pa-3 mt-3">
           <legend class="text-h5 mr-5 pa-2">اعضای خانواده</legend>
-          <field-array field-key="family" />
+          <family-member-array field-key="family" />
         </fieldset>
 
         <div
