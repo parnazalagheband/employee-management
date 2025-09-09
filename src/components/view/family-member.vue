@@ -15,31 +15,19 @@
       <v-form class="pa-3">
         <v-row>
           <v-col cols="12" md="6" sm="12">
-            <v-text-field
+            <base-input
               label="نام"
               placeholder="سارا"
-              type="text"
-              variant="outlined"
-              v-model="name"
-              :error-messages="nameError"
+              :rules="employeeRules.family.name"
+              :field-key="memberName"
             />
           </v-col>
           <v-col cols="12" md="6">
-            <v-text-field
-              :class="`custom-input-${index}`"
-              variant="outlined"
-              append-inner-icon="mdi-calendar-week-begin-outline"
-              v-model="dob"
-              :error-messages="dobError"
+            <base-date-picker
               placeholder="تاریخ تولد"
-            />
-            <date-picker
-              color="#536DFE"
-              format="jYYYY/jMM/jDD"
-              locale="fa"
-              v-model="dob"
-              :custom-input="`.custom-input-${index}`"
-              type="date"
+              :field-key="memberBirthday"
+              :rules="employeeRules.dateOfBirth"
+              :id="index"
             />
           </v-col>
         </v-row>
@@ -72,21 +60,12 @@ const props = defineProps({
   memberBirthday: String,
 });
 
-const memberName = computed(() => props.memberName);
 const memberRelation = computed(() => props.memberRelation);
-const memberBirthday = computed(() => props.memberBirthday);
 
-const { value: name, errorMessage: nameError } = useField(
-  memberName,
-  employeeRules.family.name
-);
+
 const { value: relation, errorMessage: relationError } = useField(
   memberRelation,
   employeeRules.family.relation
-);
-const { value: dob, errorMessage: dobError } = useField(
-  memberBirthday,
-  employeeRules.family.dateOfBirth
 );
 
 const relations = [

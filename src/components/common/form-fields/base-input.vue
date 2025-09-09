@@ -11,6 +11,8 @@
 <script setup>
 import { useField } from "vee-validate";
 
+const field = computed(() => props.fieldKey);
+
 const props = defineProps({
   fieldKey: {
     type: String,
@@ -28,5 +30,5 @@ const props = defineProps({
   placeholder: String,
 });
 
-const { value, errorMessage } = useField(props.fieldKey, props.rules);
+const { value, errorMessage } = useField(field, props.rules);
 </script>

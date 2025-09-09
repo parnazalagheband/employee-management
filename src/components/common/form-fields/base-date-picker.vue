@@ -31,7 +31,9 @@ const props = defineProps({
   id: { type: String, default: "" },
 });
 
-const uniqueId = `date-picker-${props.fieldKey}-${props.id}`;
+const uniqueId = `date-picker-${props.id}`;
 
-const { value, errorMessage } = useField(props.fieldKey, props.rules);
+const field = computed(() => props.fieldKey);
+
+const { value, errorMessage } = useField(field, props.rules);
 </script>
