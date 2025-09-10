@@ -31,13 +31,11 @@
         </v-row>
         <v-row>
           <v-col cols="12" md="6" sm="12">
-            <v-select
-              v-model="relation"
+            <base-select
               label="نسبت"
-              variant="outlined"
+              placeholder="انتخاب کنید"
               :items="relations"
-              item-title="title"
-              item-value="value"
+              :field-key="`${fieldPath}.relation`"
             />
           </v-col>
         </v-row>
@@ -47,7 +45,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+
 import { useField } from "vee-validate";
 
 const props = defineProps({
@@ -55,9 +53,6 @@ const props = defineProps({
   fieldPath: String,
 });
 
-const { value: relation, errorMessage: relationError } = useField(
-  computed(() => `${props.fieldPath}.relation`)
-);
 
 const relations = [
   { title: "دختر", value: "daughter" },
