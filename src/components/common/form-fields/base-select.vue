@@ -2,10 +2,9 @@
   <v-select
     v-model="value"
     :label="label"
-    :placeholder="placeholder"
     :items="items"
-    :item-title="itemTitle"
-    :item-value="itemValue"
+    item-title="title"
+    item-value="value"
     :variant="variant"
     :error-messages="errorMessage"
   />
@@ -21,7 +20,6 @@ const props = defineProps({
     required: true,
   },
   label: String,
-  placeholder: String,
   variant: {
     type: String,
     default: "outlined",
@@ -30,17 +28,9 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  itemTitle: {
-    type: String,
-    default: "title",
-  },
-  itemValue: {
-    type: String,
-    default: "value",
-  },
 });
 
-const { value, errorMessage } = useField(
-  computed(() => props.fieldKey)
-);
+const field = computed(() => props.fieldKey);
+
+const { value, errorMessage } = useField(field);
 </script>

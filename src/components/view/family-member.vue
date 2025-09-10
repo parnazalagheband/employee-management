@@ -33,7 +33,6 @@
           <v-col cols="12" md="6" sm="12">
             <base-select
               label="نسبت"
-              placeholder="انتخاب کنید"
               :items="relations"
               :field-key="`${fieldPath}.relation`"
             />
@@ -45,8 +44,6 @@
 </template>
 
 <script setup>
-
-import { useField } from "vee-validate";
 
 const props = defineProps({
   index: Number,
