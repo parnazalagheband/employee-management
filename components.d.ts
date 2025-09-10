@@ -17,6 +17,7 @@ declare module 'vue' {
     EmployeeList: typeof import('./src/components/view/employee-list.vue')['default']
     FamilyMember: typeof import('./src/components/view/family-member.vue')['default']
     FamilyMemberArray: typeof import('./src/components/view/family-member-array.vue')['default']
+    FamilyMembers: typeof import('./src/components/view/family-members.vue')['default']
     FieldArray: typeof import('./src/components/view/field-array.vue')['default']
     GlobalLoader: typeof import('./src/components/common/global-loader.vue')['default']
     NoEmployee: typeof import('./src/components/view/no-employee.vue')['default']
