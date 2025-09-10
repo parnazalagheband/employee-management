@@ -117,7 +117,7 @@ const initialValues = computed(() => {
 })
 
 const formKey = computed(() =>
-  `${props.formType}-${props.id || 'new'}-${JSON.stringify(props.formData)}`
+  `${props.formType}-${props.id}-${JSON.stringify(props.formData)}`
 )
 
 const submitForm = (vals) => {
