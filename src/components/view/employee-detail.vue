@@ -11,20 +11,22 @@
       <legend v-if="formType === 'create'" class="text-h5 mr-5 pa-2">
         افزودن کارمند
       </legend>
-      <div class="d-flex" v-if="formType === 'update'">
+      <div class="d-flex mb-4" v-if="formType === 'update'">
         <delete-employee
           @closeEmployeeForm="$emit('closeEditEmployee')"
           :id="id"
         />
       </div>
-      <v-form @submit.prevent="submitForm" class="mt-3">
+
+      <Form
+        :key="formKey"
+        :validation-schema="employeeSchema"
+        :initial-values="initialValues"
+        @submit="submitForm"
+      >
         <v-row>
           <v-col cols="12" md="6">
-            <base-input
-              label="نام"
-              placeholder="سارا"
-              field-key="firstName"
-            />
+            <base-input label="نام" placeholder="سارا" field-key="firstName" />
           </v-col>
           <v-col cols="12" md="6">
             <base-input
@@ -34,6 +36,7 @@
             />
           </v-col>
         </v-row>
+
         <v-row>
           <v-col cols="12" md="6">
             <base-date-picker
@@ -61,89 +64,80 @@
           class="d-flex justify-space-between mt-3"
         >
           <v-btn type="submit" color="green">افزودن</v-btn>
-          <v-btn @click="cancelAddEmployee" color="grey">انصراف</v-btn>
+          <v-btn @click="$emit('cancelAddEmployee')" color="grey">انصراف</v-btn>
         </div>
         <div v-if="formType === 'update'" class="text-center mt-3">
           <v-btn type="submit" color="green">بروزرسانی</v-btn>
         </div>
-      </v-form>
+      </Form>
     </fieldset>
   </v-container>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
-import { useForm, useField, useFieldArray } from "vee-validate";
-import { toast } from "@/plugins/toast";
-import { employeeSchema } from "@/validation/employeeSchema";
-import { convertDatee } from "@/composables/convertDate";
-const { toJalali, toIso } = convertDatee();
-import { useEmployeeStore } from "@/stores/employee";
+import { computed } from 'vue'
+import { Form } from 'vee-validate'
+import { employeeSchema } from '@/validation/employeeSchema'
+import { convertDatee } from '@/composables/convertDate'
+import { useEmployeeStore } from '@/stores/employee'
+import { toast } from '@/plugins/toast'
 
-const employeeStore = useEmployeeStore();
-const emit = defineEmits(["cancelAddEmployee", "closeEditEmployee"]);
+const { toJalali, toIso } = convertDatee()
+const employeeStore = useEmployeeStore()
+const emit = defineEmits(['cancelAddEmployee', 'closeEditEmployee'])
 
 const props = defineProps({
   formData: Object,
   formType: { type: String, required: true },
-  id: { type: String, default: "" },
-});
+  id: { type: String, default: '' },
+})
 
-const { handleSubmit, errors, resetForm, setValues } = useForm({
-  validationSchema: employeeSchema,
-  initialValues: {
-    firstName: "",
-    lastName: "",
-    email: "",
-    dateOfBirth: "",
+const initialValues = computed(() => {
+  if (props.formType === 'update' && props.formData) {
+    return {
+      firstName: props.formData.firstName || '',
+      lastName: props.formData.lastName || '',
+      email: props.formData.email || '',
+      dateOfBirth: props.formData.dateOfBirth
+        ? toJalali(props.formData.dateOfBirth)
+        : '',
+      family: (props.formData.family || []).map(member => ({
+        ...member,
+        dateOfBirth: member.dateOfBirth ? toJalali(member.dateOfBirth) : '',
+      })),
+    }
+  }
+  return {
+    firstName: '',
+    lastName: '',
+    email: '',
+    dateOfBirth: '',
     family: [],
-  },
-});
+  }
+})
 
-if (props.formType === "update") {
-  watch(
-    () => props.formData,
-    (newVal) => {
-      if (newVal) {
-        setValues({
-          firstName: newVal.firstName,
-          lastName: newVal.lastName,
-          email: newVal.email,
-          dateOfBirth: newVal.dateOfBirth ? toJalali(newVal.dateOfBirth) : "",
-          family: (newVal.family || []).map((member) => ({
-            ...member,
-            dateOfBirth: member.dateOfBirth ? toJalali(member.dateOfBirth) : "",
-          })),
-        });
-      }
-    },
-    { immediate: true }
-  );
-}
+const formKey = computed(() =>
+  `${props.formType}-${props.id || 'new'}-${JSON.stringify(props.formData)}`
+)
 
-const cancelAddEmployee = () => {
-  resetForm();
-  emit("cancelAddEmployee");
-};
-
-const submitForm = handleSubmit((vals) => {
+const submitForm = (vals) => {
   const payload = {
     ...vals,
-    dateOfBirth: toIso(vals.dateOfBirth),
-    family: vals.family.map((member) => ({
+    dateOfBirth: vals.dateOfBirth ? toIso(vals.dateOfBirth) : '',
+    family: vals.family.map(member => ({
       ...member,
-      dateOfBirth: member.dateOfBirth ? toIso(member.dateOfBirth) : "",
+      dateOfBirth: member.dateOfBirth ? toIso(member.dateOfBirth) : '',
     })),
-  };
-
-  if (props.formType === "update") {
-    employeeStore.updateEmployee(props.id, payload);
-    toast.success("اطلاعات کارمند با موفقیت به روزرسانی شد");
-    emit("closeEditEmployee");
-  } else {
-    employeeStore.addEmployee(payload);
-    toast.success("کارمند با موفقیت اضافه شد!");
-    cancelAddEmployee();
   }
-});
+
+  if (props.formType === 'update') {
+    employeeStore.updateEmployee(props.id, payload)
+    toast.success('اطلاعات کارمند با موفقیت به‌روزرسانی شد')
+    emit('closeEditEmployee')
+  } else {
+    employeeStore.addEmployee(payload)
+    toast.success('کارمند با موفقیت اضافه شد!')
+    emit('cancelAddEmployee')
+  }
+}
 </script>
