@@ -19,15 +19,12 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useField } from "vee-validate";
 
 const props = defineProps({
   fieldKey: { type: String, required: true },
   placeholder: String,
-  rules: {
-    type: Function,
-    default: () => "",
-  },
   id: { type: String, default: "" },
 });
 
@@ -35,5 +32,5 @@ const uniqueId = `date-picker-${props.id}`;
 
 const field = computed(() => props.fieldKey);
 
-const { value, errorMessage } = useField(field, props.rules);
+const { value, errorMessage } = useField(field);
 </script>

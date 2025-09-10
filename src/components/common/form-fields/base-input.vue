@@ -9,9 +9,8 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useField } from "vee-validate";
-
-const field = computed(() => props.fieldKey);
 
 const props = defineProps({
   fieldKey: {
@@ -22,13 +21,11 @@ const props = defineProps({
     type: String,
     default: "outlined",
   },
-  rules: {
-    type: Function,
-    default: () => "",
-  },
   label: String,
   placeholder: String,
 });
 
-const { value, errorMessage } = useField(field, props.rules);
+const field = computed(() => props.fieldKey);
+
+const { value, errorMessage } = useField(field);
 </script>

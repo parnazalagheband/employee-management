@@ -23,7 +23,6 @@
             <base-input
               label="نام"
               placeholder="سارا"
-              :rules="employeeRules.firstName"
               field-key="firstName"
             />
           </v-col>
@@ -31,7 +30,6 @@
             <base-input
               label="نام خانوادگی"
               placeholder="امینی"
-              :rules="employeeRules.lastName"
               field-key="lastName"
             />
           </v-col>
@@ -41,7 +39,6 @@
             <base-date-picker
               placeholder="تاریخ تولد"
               field-key="dateOfBirth"
-              :rules="employeeRules.dateOfBirth"
               :id="id"
             />
           </v-col>
@@ -49,7 +46,6 @@
             <base-input
               label="ایمیل"
               placeholder="sara@gmail.com"
-              :rules="employeeRules.email"
               field-key="email"
             />
           </v-col>
@@ -79,7 +75,7 @@
 import { ref, watch } from "vue";
 import { useForm, useField, useFieldArray } from "vee-validate";
 import { toast } from "@/plugins/toast";
-import { employeeRules } from "@/validation/employeeRules";
+import { employeeSchema } from "@/validation/employeeSchema";
 import { convertDatee } from "@/composables/convertDate";
 const { toJalali, toIso } = convertDatee();
 import { useEmployeeStore } from "@/stores/employee";
@@ -94,6 +90,7 @@ const props = defineProps({
 });
 
 const { handleSubmit, errors, resetForm, setValues } = useForm({
+  validationSchema: employeeSchema,
   initialValues: {
     firstName: "",
     lastName: "",

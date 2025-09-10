@@ -5,7 +5,7 @@
         <div class="d-flex align-center">
           <span>#{{ index }}</span>
           <v-btn
-            @click="$emit('removeMember', index)"
+            @click="$emit('removeMember')"
             variant="text"
             icon="mdi-delete"
             color="red"
@@ -18,15 +18,13 @@
             <base-input
               label="نام"
               placeholder="سارا"
-              :rules="employeeRules.family.name"
-              :field-key="memberName"
+              :field-key="`${fieldPath}.name`"
             />
           </v-col>
           <v-col cols="12" md="6">
             <base-date-picker
               placeholder="تاریخ تولد"
-              :field-key="memberBirthday"
-              :rules="employeeRules.dateOfBirth"
+              :field-key="`${fieldPath}.dateOfBirth`"
               :id="index"
             />
           </v-col>
@@ -40,7 +38,6 @@
               :items="relations"
               item-title="title"
               item-value="value"
-              :error-messages="relationError"
             />
           </v-col>
         </v-row>
@@ -50,22 +47,16 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useField } from "vee-validate";
-import { employeeRules } from "@/validation/employeeRules";
 
 const props = defineProps({
   index: Number,
-  memberName: String,
-  memberRelation: String,
-  memberBirthday: String,
+  fieldPath: String,
 });
 
-const memberRelation = computed(() => props.memberRelation);
-
-
 const { value: relation, errorMessage: relationError } = useField(
-  memberRelation,
-  employeeRules.family.relation
+  computed(() => `${props.fieldPath}.relation`)
 );
 
 const relations = [
