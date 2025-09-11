@@ -30,7 +30,5 @@ const props = defineProps({
 
 const uniqueId = `date-picker-${props.id}`;
 
-const field = computed(() => props.fieldKey);
-
-const { value, errorMessage } = useField(field);
+const { value, errorMessage } = useField(() => props.fieldKey);
 </script>

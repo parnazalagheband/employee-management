@@ -25,7 +25,6 @@ const props = defineProps({
   placeholder: String,
 });
 
-const field = computed(() => props.fieldKey);
+const { value, errorMessage } = useField(() => props.fieldKey);
 
-const { value, errorMessage } = useField(field);
 </script>
